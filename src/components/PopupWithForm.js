@@ -1,4 +1,5 @@
 import React from "react";
+import Form from "./Form";
 
 function PopupWithForm({
   name,
@@ -15,7 +16,14 @@ function PopupWithForm({
     >
       <div className="popup__container">
         <h2 className="popup__title">{title}</h2>
-        <form
+        <Form
+          name={name}
+          title={title}
+          children={children}
+          submitName={btnText}
+          onSubmit={onSubmit}
+        />
+        {/* <form
           action="#"
           className="popup__form"
           name={name}
@@ -26,7 +34,7 @@ function PopupWithForm({
           <button type="submit" className="popup__save-btn">
             {btnText}
           </button>
-        </form>
+        </form> */}
         <button className="popup__close-icon" onClick={onClose}></button>
       </div>
     </div>
