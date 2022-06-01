@@ -5,7 +5,7 @@ function InfoTooltip({ isOpen, onClose, noMistake }) {
     <aside className={`popup ${isOpen && "popup_opened"}`}>
       <div className="popup__container">
         <button
-          className="popup__close-button"
+          className="popup__close-icon"
           type="button"
           onClick={onClose}
         ></button>

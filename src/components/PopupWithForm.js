@@ -23,18 +23,6 @@ function PopupWithForm({
           submitName={btnText}
           onSubmit={onSubmit}
         />
-        {/* <form
-          action="#"
-          className="popup__form"
-          name={name}
-          noValidate
-          onSubmit={onSubmit}
-        >
-          {children}
-          <button type="submit" className="popup__save-btn">
-            {btnText}
-          </button>
-        </form> */}
         <button className="popup__close-icon" onClick={onClose}></button>
       </div>
     </div>
