@@ -4,7 +4,7 @@ import { api } from "../utils/api";
 import * as Auth from './Auth';
 import "../index.css";
 import Header from "./Header";
-import Main from "./Main";
+import MyProfile from "./MyProfile";
 import Footer from "./Footer";
 import DeletePopup from "./DeletePopup";
 import ImagePopup from "./ImagePopup";
@@ -150,7 +150,7 @@ function App() {
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
         <Header />
-        <Main
+        <MyProfile
           onEditProfile={handleEditProfileClick}
           onAddPlace={handleAddPlaceClick}
           onEditAvatar={handleEditAvatarClick}
