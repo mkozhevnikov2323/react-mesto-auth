@@ -11,6 +11,10 @@ import ImagePopup from "./ImagePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import EditProfilePopup from "./EditProfilePopup";
 import AddPlacePopup from "./AddPlacePopup";
+import Login from './Login';
+import Register from './Register';
+import ProtectedRoute from "./ProtectedRoute";
+import InfoTooltip from './InfoTooltip';
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 
 function App() {
@@ -23,6 +27,11 @@ function App() {
   let [selectedCard, setSelectedCard] = useState({});
   let [selectedCardToDelete, setSelectedCardToDelete] = useState({});
   let [showLoading, setShowLoading] = useState(false);
+  let [isInfoTooltip, setIsInfoTooltip] = useState(false);
+  let [loggedIn, setLoggedIn] = useState(false);
+  let [noMistake, setNoMistake] = useState(false);
+  let [userEmail, setUserEmail] = useState('');
+  let history = useHistory();
 
   useEffect(() => {
     api.getUserInfo()
@@ -39,6 +48,65 @@ function App() {
       })
       .catch((err) => console.log(err));
   }, []);
+
+  useEffect(() => {
+    tokenCheck();
+  }, []);
+
+  function handleRegSubmit(login){
+    Auth.register({
+      password:login.password,
+      email:login.email,
+  })
+    .then(() => {
+      setNoMistake(true)
+      setIsInfoTooltip(true)
+    })
+    .then((res) => {
+      history.push('/login');
+    })
+    .catch((err) => {
+      setIsInfoTooltip(true)
+      setNoMistake(false)
+      console.log(err)
+    })
+  }
+
+  function handleLogin(password, email){
+    Auth.authorize(password, email)
+      .then ((token) => {
+        Auth.getContent(token)
+          .then(() => {
+            setUserEmail(email)
+            setLoggedIn(true)
+            history.push('/my-profile')
+          })
+      .catch((err) => {
+        console.log(err)
+    })
+  })}
+
+  function signOut(){
+    localStorage.removeItem('jwt');
+    setLoggedIn(false)
+    setUserEmail("")
+    history.push('/login');
+  }
+
+  function tokenCheck() {
+      const jwt = localStorage.getItem('jwt');
+    if (jwt){
+      Auth.getContent(jwt).then((res) => {
+        if (res){
+          setLoggedIn({
+            loggedIn: true,
+          }, () => {
+            history.push("/my-profile");
+          });
+        }
+      });
+    }
+  }
 
   function handleCardLike(card) {
     const isLiked = card.likes.some(i => i._id === currentUser._id);
@@ -96,6 +164,7 @@ function App() {
     setIsDeletePopupOpen(false);
     setSelectedCard({});
     setSelectedCardToDelete({});
+    setIsInfoTooltip(false);
   }
 
   function handleUpdateUser(userData) {
@@ -147,50 +216,86 @@ function App() {
   }
 
   return (
-    <CurrentUserContext.Provider value={currentUser}>
-      <div className="page">
-        <Header />
-        <MyProfile
-          onEditProfile={handleEditProfileClick}
-          onAddPlace={handleAddPlaceClick}
-          onEditAvatar={handleEditAvatarClick}
-          onCardClick={handleCardClick}
-          onCardLike={handleCardLike}
-          onDeleteButton={handleDeleteCardClick}
-          cards={cards}
-        />
-        <Footer />
-        <EditProfilePopup
-          isOpen={isEditProfilePopupOpen}
-          onClose={closeAllPopups}
-          onUpdateUser={handleUpdateUser}
-          showLoading={showLoading}
-        />
-        <EditAvatarPopup
-          isOpen={isEditAvatarPopupOpen}
-          onClose={closeAllPopups}
-          onUpdateAvatar={handleUpdateAvatar}
-          showLoading={showLoading}
-        />
-        <ImagePopup
-          card={selectedCard}
-          onClose={closeAllPopups}
-        />
-        <AddPlacePopup
-          isOpen={isAddPlacePopupOpen}
-          onClose={closeAllPopups}
-          onAddPlace={handleAddPlaceSubmit}
-          showLoading={showLoading}
-        />
-        <DeletePopup
-          isOpen={isDeletePopupOpen}
-          onClose={closeAllPopups}
-          onCardDelete={handleCardDelete}
-          showLoading={showLoading}
-          card={selectedCardToDelete}
-        />
-      </div>
-    </CurrentUserContext.Provider>
+    <Switch>
+      <CurrentUserContext.Provider value={currentUser}>
+        <div className="page">
+          {/* <Header />
+          <MyProfile
+            onEditProfile={handleEditProfileClick}
+            onAddPlace={handleAddPlaceClick}
+            onEditAvatar={handleEditAvatarClick}
+            onCardClick={handleCardClick}
+            onCardLike={handleCardLike}
+            onDeleteButton={handleDeleteCardClick}
+            cards={cards}
+          /> */}
+          <Header
+            loggedIn={loggedIn}
+            userEmail={userEmail}
+            onSignOut={signOut}
+          />
+          <Route path="/sign-up"></Route>
+          <Route path="/sign-in"></Route>
+          <Route>
+            {loggedIn ? (
+              <Redirect to="/my-profile" />
+            ) : (
+              <Redirect to="/login" />
+            )}
+          </Route>
+          <Route exact path="/login">
+            <Login onLogin={handleLogin} />
+          </Route>
+          <Route path="/register">
+            <Register onRegister={handleRegSubmit} />
+          </Route>
+          <ProtectedRoute
+            path="/my-profile"
+            loggedIn={loggedIn}
+            component={MyProfile}
+            onEditProfile={handleEditProfileClick}
+            onAddPlace={handleAddPlaceClick}
+            onEditAvatar={handleEditAvatarClick}
+            onCardClick={handleCardClick}
+            onCardLike={handleCardLike}
+            onTrashButton={handleDeleteCardClick}
+            cards={cards}
+          />
+          <Footer />
+          <EditProfilePopup
+            isOpen={isEditProfilePopupOpen}
+            onClose={closeAllPopups}
+            onUpdateUser={handleUpdateUser}
+            showLoading={showLoading}
+          />
+          <EditAvatarPopup
+            isOpen={isEditAvatarPopupOpen}
+            onClose={closeAllPopups}
+            onUpdateAvatar={handleUpdateAvatar}
+            showLoading={showLoading}
+          />
+          <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+          <AddPlacePopup
+            isOpen={isAddPlacePopupOpen}
+            onClose={closeAllPopups}
+            onAddPlace={handleAddPlaceSubmit}
+            showLoading={showLoading}
+          />
+          <DeletePopup
+            isOpen={isDeletePopupOpen}
+            onClose={closeAllPopups}
+            onCardDelete={handleCardDelete}
+            showLoading={showLoading}
+            card={selectedCardToDelete}
+          />
+          <InfoTooltip
+            onClose={closeAllPopups}
+            isOpen={isInfoTooltip}
+            noMistake={noMistake}
+          />
+        </div>
+      </CurrentUserContext.Provider>
+    </Switch>
   );
 }
 
