@@ -1,0 +1,14 @@
+.header__nav-link {
+  font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    color: #FFFFFF;
+    text-decoration: none;
+    transition: .8s;
+}
+
+.header__nav-link:hover {
+  opacity: .6;
+}

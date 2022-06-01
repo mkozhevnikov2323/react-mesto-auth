@@ -1,0 +1,8 @@
+.login__subtitle_enter {
+  color: #FFFFFF;
+  text-decoration: none;
+  transition: .8s
+}
+.login__subtitle_enter:hover {
+  opacity: .6;
+}
