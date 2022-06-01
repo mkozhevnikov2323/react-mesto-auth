@@ -18,7 +18,6 @@ function PopupWithForm({
         <h2 className="popup__title">{title}</h2>
         <Form
           name={name}
-          title={title}
           children={children}
           submitName={btnText}
           onSubmit={onSubmit}
