@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Route, Switch, Redirect, useHistory } from 'react-router-dom';
+import { Route, Switch, Redirect, useHistory } from "react-router-dom";
 import { api } from "../utils/api";
-import * as Auth from './Auth';
+import * as Auth from "./Auth";
 import "../index.css";
 import Header from "./Header";
 import MyProfile from "./MyProfile";
@@ -11,10 +11,10 @@ import ImagePopup from "./ImagePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import EditProfilePopup from "./EditProfilePopup";
 import AddPlacePopup from "./AddPlacePopup";
-import Login from './Login';
-import Register from './Register';
+import Login from "./Login";
+import Register from "./Register";
 import ProtectedRoute from "./ProtectedRoute";
-import InfoTooltip from './InfoTooltip';
+import InfoTooltip from "./InfoTooltip";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 
 function App() {
@@ -30,11 +30,12 @@ function App() {
   let [isInfoTooltip, setIsInfoTooltip] = useState(false);
   let [loggedIn, setLoggedIn] = useState(false);
   let [noMistake, setNoMistake] = useState(false);
-  let [userEmail, setUserEmail] = useState('');
+  let [userEmail, setUserEmail] = useState("");
   let history = useHistory();
 
   useEffect(() => {
-    api.getUserInfo()
+    api
+      .getUserInfo()
       .then((userInfoFromServer) => {
         setCurrentUser(userInfoFromServer);
       })
@@ -42,7 +43,8 @@ function App() {
   }, []);
 
   useEffect(() => {
-    api.getInitialCards()
+    api
+      .getInitialCards()
       .then((cards) => {
         setCards(cards);
       })
@@ -51,69 +53,69 @@ function App() {
 
   useEffect(() => {
     tokenCheck();
-  }, []);
+  });
 
-  function handleRegSubmit(login){
+  function handleRegSubmit(login) {
     Auth.register({
-      password:login.password,
-      email:login.email,
-  })
-    .then(() => {
-      setNoMistake(true)
-      setIsInfoTooltip(true)
+      password: login.password,
+      email: login.email,
     })
-    .then((res) => {
-      history.push('/login');
-    })
-    .catch((err) => {
-      setIsInfoTooltip(true)
-      setNoMistake(false)
-      console.log(err)
-    })
+      .then(() => {
+        setNoMistake(true);
+        setIsInfoTooltip(true);
+      })
+      .then((res) => {
+        history.push("/login");
+      })
+      .catch((err) => {
+        setIsInfoTooltip(true);
+        setNoMistake(false);
+        console.log(err);
+      });
   }
 
-  function handleLogin(password, email){
-    Auth.authorize(password, email)
-      .then ((token) => {
-        Auth.getContent(token)
-          .then(() => {
-            setUserEmail(email)
-            setLoggedIn(true)
-            history.push('/my-profile')
-          })
-      .catch((err) => {
-        console.log(err)
-    })
-  })}
+  function handleLogin(password, email) {
+    Auth.authorize(password, email).then((token) => {
+      Auth.getContent(token)
+        .then(() => {
+          setUserEmail(email);
+          setLoggedIn(true);
+          history.push("/my-profile");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    });
+  }
 
-  function signOut(){
-    localStorage.removeItem('jwt');
-    setLoggedIn(false)
-    setUserEmail("")
+  function signOut() {
+    localStorage.removeItem('token');
+    setLoggedIn(false);
+    setUserEmail('');
     history.push('/login');
   }
 
   function tokenCheck() {
-      const jwt = localStorage.getItem('jwt');
-    if (jwt){
-      Auth.getContent(jwt).then((res) => {
-        if (res){
-          setLoggedIn({
-            loggedIn: true,
-          }, () => {
-            history.push("/my-profile");
-          });
+    const token = localStorage.getItem('token');
+    if (token) {
+      Auth.getContent(token).then((res) => {
+        if (res) {
+          setUserEmail(res.data.email);
+          setLoggedIn(true);
+          history.push('/my-profile');
         }
       });
     }
   }
 
   function handleCardLike(card) {
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    const isLiked = card.likes.some((i) => i._id === currentUser._id);
     api
       .changeLikeCardStatus(card._id, !isLiked)
       .then((newCard) => {
-        setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
+        setCards((state) =>
+          state.map((c) => (c._id === card._id ? newCard : c))
+        );
       })
       .catch((err) => {
         console.log(err);
