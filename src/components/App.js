@@ -53,7 +53,7 @@ function App() {
 
   useEffect(() => {
     tokenCheck();
-  });
+  }, []);
 
   function handleRegSubmit(login) {
     auth.register({
@@ -75,19 +75,21 @@ function App() {
   }
 
   function handleLogin(password, email) {
-    auth.authorize(password, email).then(() => {
-      auth.getContent(localStorage.getItem('token'))
-        .then(() => {
+    auth
+      .authorize(password, email)
+      .then((data) => {
+        if (data.token) {
+          localStorage.setItem("token", data.token);
           setUserEmail(email);
           setLoggedIn(true);
           history.push("/my-profile");
-        })
-        .catch((err) => {
-          setIsInfoTooltip(true);
-          setNoMistake(false);
-          console.log(err);
-        });
-    });
+        }
+      })
+      .catch((err) => {
+        setIsInfoTooltip(true);
+        setNoMistake(false);
+        console.log(err);
+      });
   }
 
   function signOut() {
