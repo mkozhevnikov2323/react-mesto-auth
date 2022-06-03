@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Route, Switch, Redirect, useHistory } from "react-router-dom";
 import { api } from "../utils/api";
-import * as Auth from "./Auth";
+import * as auth from "../utils/auth";
 import "../index.css";
 import Header from "./Header";
 import MyProfile from "./MyProfile";
@@ -18,20 +18,20 @@ import InfoTooltip from "./InfoTooltip";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 
 function App() {
-  let [cards, setCards] = useState([]);
-  let [currentUser, setCurrentUser] = useState({});
-  let [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
-  let [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
-  let [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
-  let [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
-  let [selectedCard, setSelectedCard] = useState({});
-  let [selectedCardToDelete, setSelectedCardToDelete] = useState({});
-  let [showLoading, setShowLoading] = useState(false);
-  let [isInfoTooltip, setIsInfoTooltip] = useState(false);
-  let [loggedIn, setLoggedIn] = useState(false);
-  let [noMistake, setNoMistake] = useState(false);
-  let [userEmail, setUserEmail] = useState("");
-  let history = useHistory();
+  const [cards, setCards] = useState([]);
+  const [currentUser, setCurrentUser] = useState({});
+  const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
+  const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
+  const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
+  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
+  const [selectedCard, setSelectedCard] = useState({});
+  const [selectedCardToDelete, setSelectedCardToDelete] = useState({});
+  const [showLoading, setShowLoading] = useState(false);
+  const [isInfoTooltip, setIsInfoTooltip] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [noMistake, setNoMistake] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const history = useHistory();
 
   useEffect(() => {
     api
@@ -56,7 +56,7 @@ function App() {
   });
 
   function handleRegSubmit(login) {
-    Auth.register({
+    auth.register({
       password: login.password,
       email: login.email,
     })
@@ -75,14 +75,16 @@ function App() {
   }
 
   function handleLogin(password, email) {
-    Auth.authorize(password, email).then((token) => {
-      Auth.getContent(token)
+    auth.authorize(password, email).then(() => {
+      auth.getContent(localStorage.getItem('token'))
         .then(() => {
           setUserEmail(email);
           setLoggedIn(true);
           history.push("/my-profile");
         })
         .catch((err) => {
+          setIsInfoTooltip(true);
+          setNoMistake(false);
           console.log(err);
         });
     });
@@ -98,12 +100,14 @@ function App() {
   function tokenCheck() {
     const token = localStorage.getItem('token');
     if (token) {
-      Auth.getContent(token).then((res) => {
+      auth.getContent(token).then((res) => {
         if (res) {
           setUserEmail(res.data.email);
           setLoggedIn(true);
           history.push('/my-profile');
         }
+      }).catch((err) => {
+        console.log(err);
       });
     }
   }
@@ -221,16 +225,6 @@ function App() {
     <Switch>
       <CurrentUserContext.Provider value={currentUser}>
         <div className="page">
-          {/* <Header />
-          <MyProfile
-            onEditProfile={handleEditProfileClick}
-            onAddPlace={handleAddPlaceClick}
-            onEditAvatar={handleEditAvatarClick}
-            onCardClick={handleCardClick}
-            onCardLike={handleCardLike}
-            onDeleteButton={handleDeleteCardClick}
-            cards={cards}
-          /> */}
           <Header
             loggedIn={loggedIn}
             userEmail={userEmail}

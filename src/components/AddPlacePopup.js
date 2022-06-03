@@ -1,9 +1,9 @@
 import React from "react";
 import PopupWithForm from "./PopupWithForm";
 
-function AddPlacePopup({isOpen, onClose, onAddPlace, showLoading}) {
-  let [name, setName] = React.useState('');
-  let [link, setLink] = React.useState('');
+function AddPlacePopup({ isOpen, onClose, onAddPlace, showLoading }) {
+  const [name, setName] = React.useState("");
+  const [link, setLink] = React.useState("");
 
   function handleNameChange(e) {
     setName(e.target.value);
@@ -16,18 +16,25 @@ function AddPlacePopup({isOpen, onClose, onAddPlace, showLoading}) {
   function handleSubmit(e) {
     e.preventDefault();
     onAddPlace({
-    name,
-    link
+      name,
+      link,
     });
   }
 
   React.useEffect(() => {
-    setName('');
-    setLink('');
+    setName("");
+    setLink("");
   }, [isOpen]);
 
   return (
-    <PopupWithForm name="add-place" title="Новое место" btnText={showLoading ? 'Сохранение...' : 'Создать'} isOpen={ isOpen } onClose={ onClose } onSubmit={handleSubmit}>
+    <PopupWithForm
+      name="add-place"
+      title="Новое место"
+      btnText={showLoading ? "Сохранение..." : "Создать"}
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={handleSubmit}
+    >
       <input
         id="nameOfImage"
         name="name"
@@ -38,7 +45,8 @@ function AddPlacePopup({isOpen, onClose, onAddPlace, showLoading}) {
         className="popup__input"
         required
         value={name || ""}
-        onChange={handleNameChange}/>
+        onChange={handleNameChange}
+      />
       <span className="popup__error popup__error_visible nameOfImage-error" />
       <input
         id="linkOfImage"
@@ -48,8 +56,12 @@ function AddPlacePopup({isOpen, onClose, onAddPlace, showLoading}) {
         className="popup__input"
         required
         value={link || ""}
-        onChange={handleLinkChange}/>
-      <span id="spanOfImage" className="popup__error popup__error_visible linkOfImage-error" />
+        onChange={handleLinkChange}
+      />
+      <span
+        id="spanOfImage"
+        className="popup__error popup__error_visible linkOfImage-error"
+      />
     </PopupWithForm>
   );
 }
